@@ -1,0 +1,40 @@
+package vn.cineshow.model;
+
+import jakarta.persistence.*;
+import lombok.*;
+import lombok.experimental.FieldDefaults;
+import vn.cineshow.enums.OrderStatus;
+
+import java.io.Serializable;
+import java.util.List;
+
+@Entity(name = "Orders")
+@Getter
+@Setter
+@NoArgsConstructor
+@AllArgsConstructor
+@Builder
+@FieldDefaults(level = AccessLevel.PRIVATE)
+public class Order extends AbstractEntity implements Serializable {
+
+    @ManyToOne
+    Customer customer;
+
+    @Column(columnDefinition = "decimal(10,2) DEFAULT 0.00")
+    Double totalPrice;
+
+    @Enumerated(EnumType.STRING)
+    OrderStatus orderStatus; //PENDING, COMPLETED, CANCELED
+
+    @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.EAGER, mappedBy = "order")
+    private List<Payment> payments;
+
+    @OneToMany(cascade = {CascadeType.PERSIST, CascadeType.REMOVE}, fetch = FetchType.LAZY, mappedBy = "order")
+    private List<OrderFood> orderCombos;
+
+    @ManyToOne (fetch = FetchType.LAZY )
+    Voucher voucher;
+
+    @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.LAZY,mappedBy = "order")
+    private List<Ticket> tickets;
+}

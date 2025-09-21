@@ -1,0 +1,28 @@
+server:
+  port: 8885
+
+spring:
+  application:
+    name: VN SocialNet
+  profiles:
+    active: @spring.profiles.active@
+  jackson:
+    time-zone: Asia/Ho_Chi_Minh
+    date-format: yyyy-MM-dd HH:mm:ss
+  jpa:
+    properties:
+      hibernate:
+        jdbc:
+          time_zone: Asia/Ho_Chi_Minh
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: '*' # mở tất cả các endpoint của Actuator
+
+logging:
+  level:
+    root: INFO
+    web: INFO
+
