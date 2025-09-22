@@ -4,12 +4,13 @@ import jakarta.persistence.*;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
 import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 import vn.cineshow.enums.UserStatus;
 
 import java.io.Serializable;
 import java.util.Collection;
-import java.util.List;
+import java.util.Collections;
 
 @Entity
 @Table(name = "accounts")
@@ -37,16 +38,17 @@ public class Account extends AbstractEntity implements Serializable, UserDetails
     public Collection<? extends GrantedAuthority> getAuthorities() {
 
         //get Role
-
+        Role userRole = role;
         //get role name
+        String roleName = role.getRoleName();
 
         //add role name to authority
-        return List.of();
+        return Collections.singleton(new SimpleGrantedAuthority(roleName));
     }
 
     @Override
     public String getUsername() {
-        return "";
+        return email;
     }
 
     @Override
@@ -66,6 +68,6 @@ public class Account extends AbstractEntity implements Serializable, UserDetails
 
     @Override
     public boolean isEnabled() {
-        return UserDetails.super.isEnabled();
+        return UserStatus.ACTIVE.equals(status);
     }
 }
