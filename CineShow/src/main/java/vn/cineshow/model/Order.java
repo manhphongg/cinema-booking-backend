@@ -18,7 +18,7 @@ import java.util.List;
 public class Order extends AbstractEntity implements Serializable {
 
     @ManyToOne
-    Customer customer;
+    User user;
 
     @Column(columnDefinition = "decimal(10,2) DEFAULT 0.00")
     Double totalPrice;

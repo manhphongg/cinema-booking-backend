@@ -1,13 +1,19 @@
 package vn.cineshow.model;
 
 import jakarta.persistence.*;
-import lombok.AccessLevel;
+import lombok.*;
 import lombok.experimental.FieldDefaults;
 
 import java.io.Serializable;
+import java.util.List;
 
-@Entity(name = "Users")
-@Inheritance(strategy = InheritanceType.JOINED)
+@Entity
+@Table(name = "users")
+@Getter
+@Setter
+@NoArgsConstructor
+@AllArgsConstructor
+@Builder
 @FieldDefaults(level = AccessLevel.PRIVATE)
 public class User extends AbstractEntity implements Serializable {
 
@@ -15,11 +21,14 @@ public class User extends AbstractEntity implements Serializable {
 
     String address;
 
-    // --- THAY ĐỔI Ở ĐÂY ---
-    // 1. Xóa mappedBy = "user"
-    // 2. Thêm @JoinColumn để tạo cột account_id trong bảng users
-    @OneToOne(cascade = CascadeType.ALL)
+    @OneToOne()
     @JoinColumn(name = "account_id", referencedColumnName = "id")
     Account account;
+
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    private List<Order> orders;
+
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    private List<VoucherItem>  voucherItems;
 
 }

@@ -1,5 +1,6 @@
 package vn.cineshow.model;
 
+import jakarta.persistence.CascadeType;
 import jakarta.persistence.Entity;
 import jakarta.persistence.OneToOne;
 import jakarta.persistence.Table;
@@ -18,18 +19,13 @@ import java.io.Serializable;
 @Builder
 @FieldDefaults(level = AccessLevel.PRIVATE)
 public class Account extends AbstractEntity implements Serializable {
-    String username;
-
     String email;
 
     String password;
 
     UserStatus status;
 
-    // --- THAY ĐỔI Ở ĐÂY ---
-    // 1. Thêm mappedBy="account" để chỉ ra rằng
-    //    trường "account" trong lớp User đang quản lý mối quan hệ này.
-    @OneToOne(mappedBy = "account")
+    @OneToOne(mappedBy = "account", cascade = CascadeType.ALL)
     User user;
 
 }

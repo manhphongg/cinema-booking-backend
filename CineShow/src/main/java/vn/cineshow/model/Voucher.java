@@ -1,13 +1,12 @@
 package vn.cineshow.model;
 
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.ManyToOne;
+import jakarta.persistence.*;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
 
 import java.io.Serializable;
 import java.time.LocalDate;
+import java.util.List;
 
 @Getter
 @Setter
@@ -18,7 +17,7 @@ import java.time.LocalDate;
 @FieldDefaults(level = AccessLevel.PRIVATE)
 public class Voucher extends AbstractEntity implements Serializable {
 
-    @Column(nullable = false, unique = true, columnDefinition = "VARCHAR(50)")
+    @Column(nullable = false, unique = true, columnDefinition = "TEXT")
     String code;
 
     int discount;
@@ -34,8 +33,9 @@ public class Voucher extends AbstractEntity implements Serializable {
 
     LocalDate endDate;
 
-    @ManyToOne
-    Customer customer;
+    @OneToMany(mappedBy = "voucher", cascade = CascadeType.ALL)
+    private List<VoucherItem> voucherItems;
+
 
     @Column(nullable = false)
     boolean isActive =false;

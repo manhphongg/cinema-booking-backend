@@ -27,6 +27,6 @@ public class PaymentMethod extends AbstractEntity implements Serializable {
     boolean isActive;
 
     @OneToMany(mappedBy = "method")
-    List<Payment> payments;
+    private List<Payment> payments;
 
 }
