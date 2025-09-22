@@ -15,7 +15,11 @@ public class User extends AbstractEntity implements Serializable {
 
     String address;
 
-    @OneToOne(mappedBy = "user", cascade = CascadeType.ALL)
+    // --- THAY ĐỔI Ở ĐÂY ---
+    // 1. Xóa mappedBy = "user"
+    // 2. Thêm @JoinColumn để tạo cột account_id trong bảng users
+    @OneToOne(cascade = CascadeType.ALL)
+    @JoinColumn(name = "account_id", referencedColumnName = "id")
     Account account;
 
 }

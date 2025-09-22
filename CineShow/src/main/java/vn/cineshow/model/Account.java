@@ -26,7 +26,10 @@ public class Account extends AbstractEntity implements Serializable {
 
     UserStatus status;
 
-    @OneToOne
+    // --- THAY ĐỔI Ở ĐÂY ---
+    // 1. Thêm mappedBy="account" để chỉ ra rằng
+    //    trường "account" trong lớp User đang quản lý mối quan hệ này.
+    @OneToOne(mappedBy = "account")
     User user;
 
 }
