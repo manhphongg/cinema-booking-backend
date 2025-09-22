@@ -37,10 +37,16 @@ spring:
 #      hibernate:
 #        format_sql: true
 #        dialect: org.hibernate.dialect.SQLServerDialect
-sendgrid:
-  api-key: ${SENDGRID_API_KEY}
-  from-email: "manhphongg6572@gmail.com"
+  sendgrid:
+    api-key: ${SENDGRID_API_KEY}
+    from-email: "manhphongg6572@gmail.com"
 
 
 admin: { email_default: "manhphong6572@gmail.com", password_default: "12345678" }
+
+jwt:
+  secret-key-access-token: "8mhZcWZVPhDeucdGaUQhUQoSkda3+jAtkBPJNP/4dvQ="
+  secret-key-refresh-token: "Gu4jjMNk9oBnertRHqfRZJdHnz5jihbbnjAHeWNQbpg="
+  expiration-access-token: 3600000  #1000 * 60 * 60 time exist
+  expiration-refresh-token: 2592000000     #1000 * 60 * 60 * 24 *30
 
