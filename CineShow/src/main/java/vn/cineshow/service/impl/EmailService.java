@@ -91,5 +91,33 @@ public class EmailService {
         }
     }
 
+    public void sendOtpEmail(String toEmail, String otp) {
+        Email fromEmail = new Email(from);
+        Email toEmailEmail = new Email(toEmail);
+        Email otpEmail = new Email(otp);
+        String subject = "OTP Email";
+        String text = "Your OTP is: " + otp;
+        Content content = new Content("text/plain", text);
+        Mail mail = new Mail(fromEmail, subject, toEmailEmail, content);
+
+        Request request = new Request();
+
+        try {
+            request.setMethod(Method.POST);
+            request.setEndpoint("mail/send");
+            request.setBody(mail.build());
+
+            Response response = sendgrid.api(request);
+            if (response.getStatusCode() == 202) { //accepted
+                log.info("Email Sent Successfully");
+            } else {
+                log.error("Email Sent Failed" + response.getBody());
+            }
+        } catch (IOException e) {
+            log.error("Error occurred while sending email, error message: " + e.getMessage());
+        }
+
+    }
+
 
 }

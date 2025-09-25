@@ -2,7 +2,6 @@ package vn.cineshow.dto.request;
 
 public class ForgotPasswordRequest {
     private String email;
-    private String newPassword;
 
     // Getters & Setters
     public String getEmail() {
@@ -13,11 +12,5 @@ public class ForgotPasswordRequest {
         this.email = email;
     }
 
-    public String getNewPassword() {
-        return newPassword;
-    }
 
-    public void setNewPassword(String newPassword) {
-        this.newPassword = newPassword;
-    }
 }
