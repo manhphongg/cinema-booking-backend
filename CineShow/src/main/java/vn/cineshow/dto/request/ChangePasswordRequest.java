@@ -1,7 +1,6 @@
 package vn.cineshow.dto.request;
 
 import lombok.*;
-import vn.cineshow.utils.validator.Password;
 
 @Getter
 @Setter
@@ -11,5 +10,4 @@ import vn.cineshow.utils.validator.Password;
 public class ChangePasswordRequest {
     private String oldPassword;
     private String newPassword;
-
 }
