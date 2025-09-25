@@ -9,10 +9,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseCookie;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 import vn.cineshow.dto.request.SignInRequest;
 import vn.cineshow.dto.response.ResponseData;
 import vn.cineshow.dto.response.SignInResponse;
@@ -30,7 +27,7 @@ public class AuthenticationController {
 
     private final AuthenticationService authenticationService;
 
-    @Operation(summary = "Access token", description = "Get access token and refresh token by email and password")
+    @Operation(summary = "Access token", description = "Get access token  email and password")
     @PostMapping("/log-in")
     public ResponseData<SignInResponse> getAccessToken(@RequestBody @Valid SignInRequest req, HttpServletResponse response) {
         log.info("Access token request:");
@@ -47,6 +44,7 @@ public class AuthenticationController {
 
         response.addHeader(HttpHeaders.SET_COOKIE, cookie.toString());
 
+        log.info("Access token response:" + tokenResponse.getAccessToken());
         //return access token + account info
         return new ResponseData<>(HttpStatus.OK.value(),
                 "Login successful",
@@ -56,6 +54,18 @@ public class AuthenticationController {
                         .email(tokenResponse.getEmail())
                         .userId(tokenResponse.getUserId())
                         .build()
+        );
+    }
+
+    @Operation(summary = "Refresh access token", description = "Get access token by refresh token when access token expired")
+    @PostMapping("/refresh-token")
+    public ResponseData<SignInResponse> refreshAccessToken(@CookieValue("refreshToken") String refreshToken) {
+        log.info("Get new access token request:");
+        SignInResponse tokenResponse = authenticationService.refresh(refreshToken);
+        log.info("Generated new access token for user {}: {}", tokenResponse.getEmail(), tokenResponse.getAccessToken());
+        return new ResponseData<>(HttpStatus.OK.value(),
+                "Token refreshed successfully",
+                tokenResponse
         );
     }
 
