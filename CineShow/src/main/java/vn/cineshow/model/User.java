@@ -21,6 +21,8 @@ public class User extends AbstractEntity implements Serializable {
 
     String address;
 
+    int loyalPoint;
+
     @OneToOne()
     @JoinColumn(name = "account_id", referencedColumnName = "id")
     Account account;
@@ -29,6 +31,6 @@ public class User extends AbstractEntity implements Serializable {
     private List<Order> orders;
 
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
-    private List<VoucherItem>  voucherItems;
+    private List<VoucherItem> voucherItems;
 
 }

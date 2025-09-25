@@ -6,11 +6,12 @@ import lombok.experimental.FieldDefaults;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
-import vn.cineshow.enums.UserStatus;
+import vn.cineshow.enums.AccountStatus;
 
 import java.io.Serializable;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.List;
 
 @Entity
 @Table(name = "accounts")
@@ -25,7 +26,8 @@ public class Account extends AbstractEntity implements Serializable, UserDetails
 
     String password;
 
-    UserStatus status;
+    @Enumerated(EnumType.STRING)
+    AccountStatus status;
 
     @ManyToOne()
     @JoinColumn(name = "role_id")
@@ -33,6 +35,9 @@ public class Account extends AbstractEntity implements Serializable, UserDetails
 
     @OneToOne(mappedBy = "account", cascade = CascadeType.ALL)
     User user;
+
+    @OneToMany(mappedBy = "account", cascade = CascadeType.ALL)
+    List<AccountProvider> providers;
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
@@ -68,6 +73,6 @@ public class Account extends AbstractEntity implements Serializable, UserDetails
 
     @Override
     public boolean isEnabled() {
-        return UserStatus.ACTIVE.equals(status);
+        return AccountStatus.ACTIVE.equals(status);
     }
 }

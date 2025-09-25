@@ -1,10 +1,7 @@
 package vn.cineshow.model;
 
-import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import jakarta.persistence.Entity;
+import lombok.*;
 
 import java.io.Serializable;
 
@@ -13,8 +10,8 @@ import java.io.Serializable;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
+@Builder
 public class Role extends AbstractEntity implements Serializable {
-
     private String roleName;
-
+    private String description;
 }
