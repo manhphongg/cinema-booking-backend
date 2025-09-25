@@ -10,4 +10,8 @@ public interface JWTService {
     String generateRefreshToken(String email, List<String> authorities);
 
     String extractUsername(String token, TokenType tokenType);
+
+    long getAccessTokenExpiryInSecond();
+
+    long getRefreshTokenExpiryInSecond();
 }

@@ -3,6 +3,36 @@ spring:
     activate:
       on-profile: dev
 
+  #config oAuth 2.0
+  security:
+    oauth2:
+      client:
+        registration:
+          google-user:
+            client-id: ${GOOGLE_CLIENT_ID}
+            client-secret: ${GOOGLE_CLIENT_SECRET}
+            redirect-uri: "{baseUrl}/login/oauth2/code/google-user"
+            provider: google
+            scope:
+              - openid
+              - profile
+              - email
+          google-admin:
+            client-id: ${GOOGLE_CLIENT_ID}
+            client-secret: ${GOOGLE_CLIENT_SECRET}
+            redirect-uri: "{baseUrl}/login/oauth2/code/google-admin"
+            provider: google
+            scope:
+              - openid
+              - profile
+              - email
+        provider:
+          google:
+            user-info-uri: https://www.googleapis.com/oauth2/v3/userinfo
+            authorization-uri: https://accounts.google.com/o/oauth2/v2/auth
+            token-uri: https://oauth2.googleapis.com/token
+            user-name-attribute: sub
+
   devtools:
     add-properties: true
 
@@ -42,7 +72,8 @@ spring:
     from-email: "manhphongg6572@gmail.com"
 
 
-admin: { email_default: "manhphong6572@gmail.com", password_default: "12345678" }
+admin: { email_default: "admin@test.com", password_default: "12345678" }
+user-account-test: { email: "user@test.com", password: "12345678" }
 
 jwt:
   secret-key-access-token: "8mhZcWZVPhDeucdGaUQhUQoSkda34jAtkBPJNP54dvQ"

@@ -64,8 +64,17 @@ public class JWTServiceImpl implements JWTService {
     @Override
     public String extractUsername(String token, TokenType tokenType) {
         log.info("Extract username from access token {}", token);
-
         return extractClaims(tokenType, token, claims -> claims.getSubject());
+    }
+
+    @Override
+    public long getAccessTokenExpiryInSecond() {
+        return expiration_access_token / 1000;
+    }
+
+    @Override
+    public long getRefreshTokenExpiryInSecond() {
+        return expiration_refresh_token / 1000;
     }
 
     private <T> T extractClaims(TokenType type, String token, Function<Claims, T> claimsExtractor) {

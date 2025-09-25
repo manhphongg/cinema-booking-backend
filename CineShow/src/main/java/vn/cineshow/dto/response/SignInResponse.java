@@ -1,15 +1,14 @@
 package vn.cineshow.dto.response;
 
-import lombok.Builder;
-import lombok.Getter;
-import lombok.Setter;
+import lombok.*;
 
 @Getter
 @Setter
+@NoArgsConstructor
+@AllArgsConstructor
 @Builder
-public class TokenResponse {
+public class SignInResponse {
     private String accessToken;
-    private String refreshToken;
     private long userId;
     private String roleName;
     private String email;
