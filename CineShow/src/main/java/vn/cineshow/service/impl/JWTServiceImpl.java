@@ -63,7 +63,7 @@ public class JWTServiceImpl implements JWTService {
 
     @Override
     public String extractUsername(String token, TokenType tokenType) {
-        log.info("Extract username from access token {}", token);
+        log.info("Extract username from access token: {}", token);
         return extractClaims(tokenType, token, claims -> claims.getSubject());
     }
 
