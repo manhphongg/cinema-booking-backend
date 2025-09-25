@@ -12,6 +12,10 @@ spring:
     password: ${DB_PASS:}
     driver-class-name: com.mysql.cj.jdbc.Driver
 
+  jackson:
+    time-zone: Asia/Ho_Chi_Minh
+    date-format: yyyy-MM-dd HH:mm:ss
+
   jpa:
     hibernate:
       ddl-auto: update
@@ -20,6 +24,8 @@ spring:
       hibernate:
         format_sql: true
         dialect: org.hibernate.dialect.MySQLDialect
+        jdbc:
+          time_zone: UTC
 
 
   #  datasource:

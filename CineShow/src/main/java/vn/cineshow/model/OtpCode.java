@@ -1,5 +1,5 @@
 
-package vn.cineshow.model.ids;
+package vn.cineshow.model;
 
 import jakarta.persistence.*;
 import lombok.*;

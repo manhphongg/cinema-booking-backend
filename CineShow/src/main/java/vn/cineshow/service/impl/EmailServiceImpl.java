@@ -18,7 +18,7 @@ import java.io.IOException;
 @Service
 @RequiredArgsConstructor
 @Slf4j(topic = "EMAIL-SERVICE")
-public class EmailService {
+public class EmailServiceImpl {
 
     private final SendGrid sendgrid;
     private final String TEMPLATE_ID = "d-71a24bbc41824c0495bc166a115275a0";

@@ -11,7 +11,7 @@ import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
-import vn.cineshow.dto.request.AccountCreationRequest;
+import vn.cineshow.dto.request.EmailRegisterRequest;
 import vn.cineshow.dto.request.SignInRequest;
 import vn.cineshow.dto.response.TokenResponse;
 import vn.cineshow.enums.UserRole;
@@ -81,33 +81,33 @@ public class AuthenticationServiceImpl implements AuthenticationService {
         return null;
     }
 
-    @Transactional
-    @Override
-    public long accountRegister(AccountCreationRequest req) {
-        if (isAccountExists(req.getEmail())) {
-            log.error("account already exists");
-            throw new DuplicateResourceException("account already exists");
-        }
-
-        Account account = Account.builder()
-                .email(req.getEmail())
-                .password(passwordEncoder.encode(req.getPassword()))
-                .status(UserStatus.ACTIVE)
-                .build();
-
-        Role role = roleRepository.findByRoleName((UserRole.ADMIN.name()))
-                .orElseThrow(() -> new ResourceNotFoundException("role not found"));
-        account.setRole(role);
-        User user = User.builder()
-                .name(req.getName())
-                .address(req.getAddress())
-                .build();
-        account.setUser(user);
-
-        accountRepository.save(account);
-
-        return account.getId();
-    }
+//    @Transactional
+//    @Override
+//    public long accountRegister(EmailRegisterRequest req) {
+//        if (isAccountExists(req.getEmail())) {
+//            log.error("account already exists");
+//            throw new DuplicateResourceException("account already exists");
+//        }
+//
+//        Account account = Account.builder()
+//                .email(req.getEmail())
+//                .password(passwordEncoder.encode(req.getPassword()))
+//                .status(UserStatus.ACTIVE)
+//                .build();
+//
+//        Role role = roleRepository.findByRoleName((UserRole.ADMIN.name()))
+//                .orElseThrow(() -> new ResourceNotFoundException("role not found"));
+//        account.setRole(role);
+//        User user = User.builder()
+//                .name(req.getName())
+//                .address(req.getAddress())
+//                .build();
+//        account.setUser(user);
+//
+//        accountRepository.save(account);
+//
+//        return account.getId();
+//    }
 
     private boolean isAccountExists(String email) {
         return accountRepository.findByEmail(email).isPresent();

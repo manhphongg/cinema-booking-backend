@@ -1,4 +1,5 @@
 package vn.cineshow.dto.request;
 
-public record SendOtpRequest() {
-}
+import jakarta.validation.constraints.*;
+
+public record SendOtpRequest(@NotBlank @Email String email) {}

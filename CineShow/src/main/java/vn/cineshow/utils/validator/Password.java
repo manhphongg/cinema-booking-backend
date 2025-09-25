@@ -9,6 +9,7 @@ import java.lang.annotation.*;
 @Constraint(validatedBy = PasswordValidator.class)
 @Target( { ElementType.FIELD })
 @Retention(RetentionPolicy.RUNTIME)
+
 public @interface Password {
     String message() default "Password must be between 8 and 20 characters!";
     Class<?>[] groups() default {};

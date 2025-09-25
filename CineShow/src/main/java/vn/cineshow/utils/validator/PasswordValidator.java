@@ -6,6 +6,7 @@ import jakarta.validation.ConstraintValidatorContext;
 public class PasswordValidator implements ConstraintValidator<Password, String> {
     @Override
     public boolean isValid(String password, ConstraintValidatorContext constraintValidatorContext) {
+        if (password == null) return false;
         return password.length() >= 8 && password.length() <= 20;
     }
 

@@ -6,15 +6,18 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
-import vn.cineshow.dto.request.AccountCreationRequest;
+import vn.cineshow.dto.request.EmailRegisterRequest;
 import vn.cineshow.dto.request.SignInRequest;
 import vn.cineshow.dto.response.ResponseData;
 import vn.cineshow.dto.response.TokenResponse;
 import vn.cineshow.service.AuthenticationService;
+
+import java.net.URI;
 
 @RestController
 @RequiredArgsConstructor
@@ -37,12 +40,6 @@ public class AuthenticationController {
     public TokenResponse getRefreshToken(@RequestBody SignInRequest req) {
         log.info("Refresh token request, refresh token: {}", req);
         return authenticationService.getRefreshToken(req);
-    }
-
-    @PostMapping("/register")
-    public ResponseData<Long> register(@RequestBody @Valid AccountCreationRequest req) {
-        log.info("Account creation request: {}", req);
-        return new ResponseData<>(HttpStatus.CREATED.value(), "User successfully registered", authenticationService.accountRegister(req));
     }
 
 }
