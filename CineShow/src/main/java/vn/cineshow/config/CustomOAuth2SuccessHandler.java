@@ -158,7 +158,7 @@ public class CustomOAuth2SuccessHandler implements AuthenticationSuccessHandler 
         response.sendRedirect(REDIRECT_URI);
     }
 
-    // Overload mặc định    @Override
+    @Override
     public void onAuthenticationSuccess(HttpServletRequest request, HttpServletResponse response,
                                         FilterChain chain, Authentication authentication) throws IOException, ServletException {
         AuthenticationSuccessHandler.super.onAuthenticationSuccess(request, response, chain, authentication);

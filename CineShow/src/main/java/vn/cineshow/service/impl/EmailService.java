@@ -28,7 +28,7 @@ public class EmailService {
     /**
      * Send email by SendGrid
      *
-     * @param to send email to someone
+     * @param to      send email to someone
      * @param subject
      * @param text
      */
@@ -90,5 +90,6 @@ public class EmailService {
             log.error("Error occurred while sending email, error message: " + e.getMessage());
         }
     }
+
 
 }

@@ -12,19 +12,11 @@ import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
-import vn.cineshow.dto.request.AccountCreationRequest;
-import vn.cineshow.dto.request.ChangePasswordRequest;
 import vn.cineshow.dto.request.SignInRequest;
 import vn.cineshow.dto.response.SignInResponse;
 import vn.cineshow.dto.response.TokenResponse;
-import vn.cineshow.enums.AccountStatus;
-import vn.cineshow.enums.UserRole;
-import vn.cineshow.exception.DuplicateResourceException;
-import vn.cineshow.exception.ResourceNotFoundException;
 import vn.cineshow.model.Account;
 import vn.cineshow.model.RefreshToken;
-import vn.cineshow.model.Role;
-import vn.cineshow.model.User;
 import vn.cineshow.repository.AccountRepository;
 import vn.cineshow.repository.RefreshTokenRepository;
 import vn.cineshow.repository.RoleRepository;
@@ -34,7 +26,6 @@ import vn.cineshow.service.JWTService;
 import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.UUID;
 
 @Service
 @RequiredArgsConstructor
@@ -121,54 +112,6 @@ public class AuthenticationServiceImpl implements AuthenticationService {
                 .email(account.getEmail())
                 .build();
     }
-
-    @Override
-    public long accountRegister(AccountCreationRequest req) {
-        if (isAccountExists(req.getEmail())) {
-            log.error("account already exists");
-            throw new DuplicateResourceException("account already exists");
-        }
-
-        Account account = Account.builder()
-                .email(req.getEmail())
-                .password(passwordEncoder.encode(req.getPassword()))
-                .status(AccountStatus.ACTIVE)
-                .build();
-
-        Role role = roleRepository.findByRoleName((UserRole.ADMIN.name()))
-                .orElseThrow(() -> new ResourceNotFoundException("role not found"));
-        account.setRole(role);
-        User user = User.builder()
-                .name(req.getName())
-                .address(req.getAddress())
-                .build();
-        account.setUser(user);
-
-        accountRepository.save(account);
-
-        return account.getId();
-    }
-
-    @Override
-    public void changePassword(ChangePasswordRequest req) {
-
-    }
-
-    @Override
-    public void forgotPassword(String email) {
-
-        if (!isAccountExists(email)) {
-            throw new ResourceNotFoundException("account not found");
-        } else {
-            String token = UUID.randomUUID().toString();
-            String url = "http://localhost:8885/reset-password?token=" + token;
-            String homeUrl = "http://localhost:8885/";
-            emailService.sendVerificationEmail(email, "Manh Phong", url, homeUrl);
-
-            //TODO save to db
-        }
-    }
-
 
     private boolean isAccountExists(String email) {
         return accountRepository.findByEmail(email).isPresent();
