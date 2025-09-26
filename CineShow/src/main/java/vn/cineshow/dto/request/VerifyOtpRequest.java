@@ -1,13 +1,8 @@
 package vn.cineshow.dto.request;
 
-import lombok.Getter;
-import lombok.Setter;
+import jakarta.validation.constraints.*;
 
-@Getter
-@Setter
-public class VerifyOtpRequest {
-    private String email;
-    private String otp;
-    private String newPassword;
-
-}
+public record VerifyOtpRequest(
+        @NotBlank @Email String email,
+        @NotBlank @Size(min=4,max=8) String otp
+) {}
