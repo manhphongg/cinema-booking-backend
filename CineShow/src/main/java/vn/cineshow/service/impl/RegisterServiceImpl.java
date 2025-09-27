@@ -6,6 +6,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import vn.cineshow.dto.request.EmailRegisterRequest;
 import vn.cineshow.enums.AccountStatus;
+import vn.cineshow.enums.UserRole;
 import vn.cineshow.exception.DuplicateResourceException;
 import vn.cineshow.exception.ResourceNotFoundException;
 import vn.cineshow.model.Account;
@@ -21,7 +22,6 @@ import vn.cineshow.service.RegisterService;
 @RequiredArgsConstructor
 public class RegisterServiceImpl implements RegisterService {
 
-    private static final long CUSTOMER_ROLE_ID = 3; // cố định như bạn yêu cầu
 
     private final AccountRepository accountRepo;
     private final RoleRepository roleRepo;
@@ -38,12 +38,12 @@ public class RegisterServiceImpl implements RegisterService {
         }
 
         // 1) chặn trùng email
-        if (accountRepo.findByEmail(req.email()).isPresent()) {
-            throw new DuplicateResourceException("Email already exists");
-        }
+//        if (accountRepo.findByEmail(req.email()).isPresent()) {
+//            throw new DuplicateResourceException("Email already exists");
+//        }
 
-        // 2) lấy role CUSTOMER theo ID
-        Role customer = roleRepo.findById(CUSTOMER_ROLE_ID)
+        // 2) lấy role CUSTOMER theo roleName
+        Role customer = roleRepo.findByRoleName("CUSTOMER")
                 .orElseThrow(() -> new ResourceNotFoundException("Role CUSTOMER not found"));
 
         // 3) tạo Account trước
@@ -51,11 +51,11 @@ public class RegisterServiceImpl implements RegisterService {
                 .email(req.email())
                 .password(encoder.encode(req.password()))
                 .status(AccountStatus.ACTIVE)
-                .role(customer)
+                .role(customer)   // gắn Role entity
                 .build();
         accountRepo.save(account);
 
-        // 4) tạo User gắn FK đến Account (composition)
+        // 4) tạo User gắn FK đến Account
         User user = User.builder()
                 .name(req.name())
                 .dateOfBirth(req.dateOfBirth())
@@ -70,5 +70,3 @@ public class RegisterServiceImpl implements RegisterService {
         return account.getId();
     }
 }
-
-

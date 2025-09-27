@@ -26,17 +26,5 @@ public class OtpCode {
     private Instant expiresAt;
 
     @Column(nullable=false)
-    private int attempts;        // số lần nhập đã dùng
-
-    @Column(nullable=false)
-    private int maxAttempts;     // vd 5
-
-    @Column(nullable=false)
-    private Instant lastSentAt;  // phục vụ cooldown resend
-
-    @Column
-    private Instant lockedUntil; // khóa tạm sau khi quá số lần/sai nhiều
-
-    @Column(nullable=false)
     private boolean used;        // đã verify xong -> true
 }

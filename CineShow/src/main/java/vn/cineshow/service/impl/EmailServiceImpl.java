@@ -24,6 +24,10 @@ public class EmailServiceImpl {
     private final String TEMPLATE_ID = "d-71a24bbc41824c0495bc166a115275a0";
     @Value("${spring.sendgrid.from-email}")
     private String from;
+    @Value("${app.frontend.verify-url}")
+    private String verifyBaseUrl;
+    @Value("${app.sendgrid.otp-template-id}")
+    private String otpTemplateId;
 
     /**
      * Send email by SendGrid
@@ -39,56 +43,52 @@ public class EmailServiceImpl {
         Content content = new Content("text/plain", text);
         Mail mail = new Mail(fromEmail, subject, toEmail, content);
 
-        Request request = new Request();
-
-        try {
-            request.setMethod(Method.POST);
-            request.setEndpoint("mail/send");
-            request.setBody(mail.build());
-
-            Response response = sendgrid.api(request);
-            if (response.getStatusCode() == 202) { //accepted
-                log.info("Email Sent Successfully");
-            } else {
-                log.error("Email Sent Failed" + response.getBody());
-            }
-        } catch (IOException e) {
-            log.error("Error occurred while sending email, error message: " + e.getMessage());
-        }
+        sendRequest(mail, "Send Email", to);
     }
 
-    public void sendVerificationEmail(String to, String name, String verificationUrl, String homeUrl) {
-        Email fromEmail = new Email(from);
-        Email toEmail = new Email(to);
-
+    /**
+     * Gửi OTP email bằng SendGrid template (có kèm tên người nhận)
+     *
+     * @param to   email người nhận
+     * @param name tên hiển thị trong email
+     * @param otp  mã OTP
+     */
+    public void sendOtpEmail(String to, String name, String otp) {
+        Email from = new Email(this.from);
         Mail mail = new Mail();
-        mail.setFrom(fromEmail);
-        mail.setTemplateId(TEMPLATE_ID);
-        mail.setSubject("Verification Email");
+        mail.setFrom(from);
+        mail.setTemplateId(otpTemplateId);
 
         Personalization personalization = new Personalization();
-        personalization.addTo(toEmail);
+        personalization.addTo(new Email(to));
         personalization.addDynamicTemplateData("name", name);
-        personalization.addDynamicTemplateData("verification_url", verificationUrl);
-        personalization.addDynamicTemplateData("home_url", homeUrl);
+        personalization.addDynamicTemplateData("otp", otp);
+
+        personalization.addDynamicTemplateData("verifyUrl", verifyBaseUrl + "?email=" + to);
+
         mail.addPersonalization(personalization);
 
-        Request request = new Request();
+        sendRequest(mail, "OTP Email", to);
+    }
 
+    /**
+     * Helper gọi SendGrid API + log kết quả
+     */
+    private void sendRequest(Mail mail, String type, String to) {
+        Request request = new Request();
         try {
             request.setMethod(Method.POST);
             request.setEndpoint("mail/send");
             request.setBody(mail.build());
 
             Response response = sendgrid.api(request);
-            if (response.getStatusCode() == 202) { //accepted
-                log.info("Email Sent Successfully");
+            if (response.getStatusCode() == 202) {
+                log.info("{} sent successfully to {}", type, to);
             } else {
-                log.error("Email Sent Failed" + response.getBody());
+                log.error("{} failed to {}. Response: {}", type, to, response.getBody());
             }
         } catch (IOException e) {
-            log.error("Error occurred while sending email, error message: " + e.getMessage());
+            log.error("Error sending {} to {}: {}", type, to, e.getMessage());
         }
     }
-
 }
