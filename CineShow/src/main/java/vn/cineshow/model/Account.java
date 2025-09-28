@@ -39,6 +39,9 @@ public class Account extends AbstractEntity implements Serializable, UserDetails
     @OneToMany(mappedBy = "account", cascade = CascadeType.ALL)
     List<AccountProvider> providers;
 
+    @OneToMany(mappedBy = "account", cascade = CascadeType.ALL)
+    List<OtpCode> otpCodes;
+
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
 
@@ -50,6 +53,8 @@ public class Account extends AbstractEntity implements Serializable, UserDetails
         //add role name to authority
         return Collections.singleton(new SimpleGrantedAuthority(roleName));
     }
+
+
 
     @Override
     public String getUsername() {

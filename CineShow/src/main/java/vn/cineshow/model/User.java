@@ -3,8 +3,10 @@ package vn.cineshow.model;
 import jakarta.persistence.*;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
+import vn.cineshow.enums.Gender;
 
 import java.io.Serializable;
+import java.time.LocalDate;
 import java.util.List;
 
 @Entity
@@ -17,11 +19,16 @@ import java.util.List;
 @FieldDefaults(level = AccessLevel.PRIVATE)
 public class User extends AbstractEntity implements Serializable {
 
+
     String name;
 
     String address;
 
     int loyalPoint;
+
+    LocalDate dateOfBirth;
+
+    Gender gender;
 
     @OneToOne()
     @JoinColumn(name = "account_id", referencedColumnName = "id")
