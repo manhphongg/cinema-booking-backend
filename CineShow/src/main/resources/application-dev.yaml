@@ -8,19 +8,14 @@ spring:
   #      host: localhost
   #      port: 6379
 
-  ####### REDIS CACHE CLOUD
-  #  data:
-  #    redis:
-  #      host: redis-15193.c292.ap-southeast-1-1.ec2.redns.redis-cloud.com
-  #      port: 15193
-  #      password: 6fSU3d43KtX7O9hPx0UekNcSLlITwA43
-  #      ssl:
-  #        enabled: true
-
-
-
-
-
+  #    ###### REDIS CACHE CLOUD
+  #    data:
+  #      redis:
+  #        host: redis-15193.c292.ap-southeast-1-1.ec2.redns.redis-cloud.com
+  #        port: 15193
+  #        password: 6fSU3d43KtX7O9hPx0UekNcSLlITwA43
+  #        ssl:
+  #          enabled: true
 
   #config oAuth 2.0
   security:
@@ -106,4 +101,6 @@ jwt:
   secret-key-refresh-token: "Gu4jjMNk9oBnertRHqfRZJdHnz5jihbbnjAHeWNQbpg"
   expiration-access-token: 15000 #3600000  #1000 * 60 * 60 time exist
   expiration-refresh-token: 2592000000     #1000 * 60 * 60 * 24 *30
+
+
 

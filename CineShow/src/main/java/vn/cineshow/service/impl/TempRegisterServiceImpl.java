@@ -1,17 +1,18 @@
 package vn.cineshow.service.impl;
 
 import lombok.RequiredArgsConstructor;
+import org.springframework.context.annotation.Profile;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
 import vn.cineshow.dto.request.EmailRegisterRequest;
 import vn.cineshow.service.TempRegisterService;
 
-import java.time.Duration;
 import java.util.UUID;
 import java.util.concurrent.TimeUnit;
 
 @Service
 @RequiredArgsConstructor
+@Profile("prod")
 public class TempRegisterServiceImpl implements TempRegisterService {
     private final RedisTemplate<String, Object> redisTemplate;
     private final com.fasterxml.jackson.databind.ObjectMapper mapper;
