@@ -80,6 +80,7 @@ public class CustomOAuth2SuccessHandler implements AuthenticationSuccessHandler 
         String email = (String) attributes.get("email");
         String name = (String) attributes.get("name");
         String sub = (String) attributes.get("sub");
+
         String registrationId = authToken.getAuthorizedClientRegistrationId(); // "google-user" or "google-admin"
 
         // 1. Find account by email

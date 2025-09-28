@@ -98,6 +98,8 @@ app:
 
 admin: { email_default: "admin@test.com", password_default: "12345678" }
 user-account-test: { email: "user@test.com", password: "12345678" }
+staff-account-test: { email: "staff@test.com", password: "12345678" }
+manager-account-test: { email: "manager@test.com", password: "12345678" }
 
 jwt:
   secret-key-access-token: "8mhZcWZVPhDeucdGaUQhUQoSkda34jAtkBPJNP54dvQ"
