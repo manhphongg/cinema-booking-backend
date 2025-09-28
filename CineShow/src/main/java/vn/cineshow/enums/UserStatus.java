@@ -1,8 +1,8 @@
 package vn.cineshow.enums;
 
-public enum AccountStatus {
+public enum UserStatus {
     PENDING,
     ACTIVE,
-    DEACTIVATED
+    DELETED
 
 }

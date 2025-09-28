@@ -48,6 +48,22 @@ public class ApplicationInitializer {
     @NonFinal
     String PASSWORD_USER;
 
+    @Value("${staff-account-test.email}")
+    @NonFinal
+    String EMAIL_STAFF;
+
+    @Value("${staff-account-test.password}")
+    @NonFinal
+    String PASSWORD_STAFF;
+
+    @Value("${manager-account-test.email}")
+    @NonFinal
+    String EMAIL_MANAGER;
+
+    @Value("${manager-account-test.password}")
+    @NonFinal
+    String PASSWORD_MANAGER;
+
     @Bean
     public ApplicationRunner initData() {
         return args -> {
@@ -77,9 +93,13 @@ public class ApplicationInitializer {
 
         AccountCreationRequest admin = new AccountCreationRequest(EMAIL_ADMIN, PASSWORD_ADMIN, "System Admin", "Ha Noi");
         AccountCreationRequest customer = new AccountCreationRequest(EMAIL_USER, PASSWORD_USER, "System Customer", "Da Nang");
+        AccountCreationRequest staff = new AccountCreationRequest(EMAIL_STAFF, PASSWORD_STAFF, "System Staff", "Ho Chi Minh");
+        AccountCreationRequest manager = new AccountCreationRequest(EMAIL_MANAGER, PASSWORD_MANAGER, "System Manager", "Hai Phong");
 
         createAccountIfNotExists(admin, UserRole.ADMIN.name());
         createAccountIfNotExists(customer, UserRole.CUSTOMER.name());
+        createAccountIfNotExists(staff, UserRole.STAFF.name());
+        createAccountIfNotExists(manager, UserRole.MANAGER.name());
     }
 
     void createAccountIfNotExists(AccountCreationRequest request, String roleName) {
