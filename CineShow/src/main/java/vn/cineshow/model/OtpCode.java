@@ -7,16 +7,18 @@ import lombok.*;
 import java.time.Instant;
 
 @Entity
-@Table(name="otp_codes", indexes = {
-        @Index(name="idx_otp_email", columnList="email", unique=true)
-})
+@Table(name="otp_codes")
+
 @Getter @Setter @Builder
 @AllArgsConstructor @NoArgsConstructor
 public class OtpCode {
     @Id @GeneratedValue(strategy=GenerationType.IDENTITY)
     private Long id;
 
-    @Column(nullable=false, unique=true)
+    @ManyToOne(fetch = FetchType.LAZY)
+    Account account;
+
+    @Column(nullable=false)
     private String email;
 
     @Column(nullable=false)

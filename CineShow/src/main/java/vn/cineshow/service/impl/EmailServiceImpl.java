@@ -53,10 +53,11 @@ public class EmailServiceImpl {
      * @param name tên hiển thị trong email
      * @param otp  mã OTP
      */
-    public void sendOtpEmail(String to, String name, String otp) {
+    public void sendOtpEmail(String to, String name, String otp, String subject) {
         Email from = new Email(this.from);
         Mail mail = new Mail();
         mail.setFrom(from);
+        mail.setSubject(subject);
         mail.setTemplateId(otpTemplateId);
 
         Personalization personalization = new Personalization();

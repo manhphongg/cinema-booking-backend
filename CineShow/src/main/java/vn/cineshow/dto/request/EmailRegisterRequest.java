@@ -5,6 +5,7 @@ import com.fasterxml.jackson.annotation.JsonFormat;
 import jakarta.validation.constraints.*;
 import java.time.LocalDate;
 import vn.cineshow.enums.Gender;
+import vn.cineshow.model.OtpCode;
 
 public record EmailRegisterRequest(
         @NotBlank @Email String email,
@@ -13,5 +14,5 @@ public record EmailRegisterRequest(
         @NotNull Gender gender,
         @NotBlank @Size(min=8,max=64) String password,
         @NotBlank @Size(min=8,max=64) String confirmPassword,
-        String token
+        String otp
 ) {}
