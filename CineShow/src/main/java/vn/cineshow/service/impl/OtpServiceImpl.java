@@ -7,8 +7,6 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import vn.cineshow.exception.AppException;
-import vn.cineshow.exception.ErrorCode;
 import vn.cineshow.model.OtpCode;
 import vn.cineshow.repository.OtpCodeRepository;
 import vn.cineshow.service.OtpService;
@@ -75,24 +73,4 @@ public class OtpServiceImpl implements OtpService {
     public void clearState(String email) {
         otpRepo.deleteByEmail(email);
     }
-
-    @Transactional
-    @Override
-    public boolean verifyOtp(String email, String otp) {
-        var code = otpRepo.findByEmail(email)
-                .orElseThrow(() -> new AppException(ErrorCode.OTP_NOT_FOUND));
-
-        if (code.isUsed() || code.getExpiresAt().isBefore(Instant.now())) {
-            throw new AppException(ErrorCode.OTP_EXPIRED);
-        }
-
-        if (!passwordEncoder.matches(otp, code.getOtpHash())) {
-            throw new AppException(ErrorCode.OTP_INVALID);
-        }
-
-        code.setUsed(true);
-        otpRepo.save(code);
-        return true;
-    }
-
 }

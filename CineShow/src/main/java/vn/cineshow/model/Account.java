@@ -57,6 +57,8 @@ public class Account extends AbstractEntity implements Serializable, UserDetails
         return Collections.singleton(new SimpleGrantedAuthority(roleName));
     }
 
+
+
     @Override
     public String getUsername() {
         return email;
