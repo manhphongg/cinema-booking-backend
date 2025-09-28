@@ -342,6 +342,19 @@ public class GlobalExceptionHandler {
     }
 
 
+    @ExceptionHandler(AppException.class)
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    public ErrorResponse handleAppException(AppException e, WebRequest request) {
+        ErrorCode errorCode = e.getErrorCode();
+        ErrorResponse errorResponse = new ErrorResponse();
+        errorResponse.setTimestamp(LocalDateTime.now());
+        errorResponse.setInstance(request.getDescription(false).replace("uri=", ""));
+        errorResponse.setStatus(errorCode.getCode());
+        errorResponse.setTitle(errorCode.name());
+        errorResponse.setMessage(errorCode.getMessage());
+        return errorResponse;
+    }
+
     private void setResponseBadRequest(ErrorResponse errorResponse, WebRequest req) {
         errorResponse.setTitle(HttpStatus.BAD_REQUEST.getReasonPhrase()); // "Bad Request"
         errorResponse.setStatus(HttpStatus.BAD_REQUEST.value());
