@@ -1,6 +1,5 @@
 package vn.cineshow.service;
 
-import org.springframework.transaction.annotation.Transactional;
 import vn.cineshow.dto.request.UpdateUserRequest;
 import vn.cineshow.dto.response.UserResponse;
 
