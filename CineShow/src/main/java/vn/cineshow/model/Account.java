@@ -47,13 +47,10 @@ public class Account extends AbstractEntity implements Serializable, UserDetails
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
-
-        //get Role
-        Role userRole = role;
-        //get role name
+        if (role == null) {
+            return Collections.emptyList();
+        }
         String roleName = role.getRoleName();
-
-        //add role name to authority
         return Collections.singleton(new SimpleGrantedAuthority(roleName));
     }
 
