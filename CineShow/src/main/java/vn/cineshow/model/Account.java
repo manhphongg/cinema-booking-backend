@@ -29,6 +29,9 @@ public class Account extends AbstractEntity implements Serializable, UserDetails
     @Enumerated(EnumType.STRING)
     AccountStatus status;
 
+    @Column(name = "is_deleted", nullable = false)
+    private boolean isDeleted = false;
+
     @ManyToOne()
     @JoinColumn(name = "role_id")
     Role role;
@@ -39,6 +42,9 @@ public class Account extends AbstractEntity implements Serializable, UserDetails
     @OneToMany(mappedBy = "account", cascade = CascadeType.ALL)
     List<AccountProvider> providers;
 
+    @OneToMany(mappedBy = "account", cascade = CascadeType.ALL)
+    List<OtpCode> otpCodes;
+
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
         if (role == null) {
@@ -47,6 +53,8 @@ public class Account extends AbstractEntity implements Serializable, UserDetails
         String roleName = role.getRoleName();
         return Collections.singleton(new SimpleGrantedAuthority(roleName));
     }
+
+
 
     @Override
     public String getUsername() {
@@ -60,8 +68,9 @@ public class Account extends AbstractEntity implements Serializable, UserDetails
 
     @Override
     public boolean isAccountNonLocked() {
-        return UserDetails.super.isAccountNonLocked();
+        return status != AccountStatus.DEACTIVATED && !isDeleted;
     }
+
 
     @Override
     public boolean isCredentialsNonExpired() {
@@ -70,6 +79,6 @@ public class Account extends AbstractEntity implements Serializable, UserDetails
 
     @Override
     public boolean isEnabled() {
-        return AccountStatus.ACTIVE.equals(status);
+        return AccountStatus.ACTIVE.equals(status) && !isDeleted;
     }
 }

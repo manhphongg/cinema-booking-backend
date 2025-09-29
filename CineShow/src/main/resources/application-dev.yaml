@@ -3,6 +3,20 @@ spring:
     activate:
       on-profile: dev
 
+  #  data:
+  #    redis:
+  #      host: localhost
+  #      port: 6379
+
+  #    ###### REDIS CACHE CLOUD
+  #    data:
+  #      redis:
+  #        host: redis-15193.c292.ap-southeast-1-1.ec2.redns.redis-cloud.com
+  #        port: 15193
+  #        password: 6fSU3d43KtX7O9hPx0UekNcSLlITwA43
+  #        ssl:
+  #          enabled: true
+
   #config oAuth 2.0
   security:
     oauth2:
@@ -71,13 +85,22 @@ spring:
     api-key: ${SENDGRID_API_KEY}
     from-email: "manhphongg6572@gmail.com"
 
+app:
+  frontend:
+    verify-url: "https://cinema.com/verify"   # URL frontend để verify OTP
+  sendgrid:
+    otp-template-id: "d-71a24bbc41824c0495bc166a115275a0"   # Template ID cho OTP
 
 admin: { email_default: "admin@test.com", password_default: "12345678" }
 user-account-test: { email: "user@test.com", password: "12345678" }
+staff-account-test: { email: "staff@test.com", password: "12345678" }
+manager-account-test: { email: "manager@test.com", password: "12345678" }
 
 jwt:
   secret-key-access-token: "8mhZcWZVPhDeucdGaUQhUQoSkda34jAtkBPJNP54dvQ"
   secret-key-refresh-token: "Gu4jjMNk9oBnertRHqfRZJdHnz5jihbbnjAHeWNQbpg"
   expiration-access-token: 900000 # 15 phút (15 * 60 * 1000)
   expiration-refresh-token: 2592000000     #1000 * 60 * 60 * 24 *30
+
+
 

@@ -23,7 +23,7 @@ import vn.cineshow.repository.RoleRepository;
 import vn.cineshow.service.AuthenticationService;
 import vn.cineshow.service.JWTService;
 
-import java.time.Instant;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -72,7 +72,7 @@ public class AuthenticationServiceImpl implements AuthenticationService {
         //save refreshToken to db
         RefreshToken entity = RefreshToken.builder()
                 .token(refreshToken)
-                .expiryDate(Instant.now().plusSeconds(jwtService.getRefreshTokenExpiryInSecond()))
+                .expiryDate(LocalDateTime.now().plusSeconds(jwtService.getRefreshTokenExpiryInSecond()))
                 .account(account).build();
         refreshTokenRepository.save(entity);
 
@@ -94,7 +94,7 @@ public class AuthenticationServiceImpl implements AuthenticationService {
                 .orElseThrow(() -> new AuthenticationServiceException("Invalid refresh token"));
 
         //check token out of Expiry date
-        if (entity.getExpiryDate().isBefore(Instant.now())) {
+        if (entity.getExpiryDate().isBefore(LocalDateTime.now())) {
             refreshTokenRepository.delete(entity);
             throw new AuthenticationServiceException("Refresh token expired");
         }

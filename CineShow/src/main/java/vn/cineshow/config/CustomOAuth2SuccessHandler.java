@@ -14,15 +14,17 @@ import org.springframework.stereotype.Component;
 import vn.cineshow.enums.AccountStatus;
 import vn.cineshow.enums.AuthProvider;
 import vn.cineshow.enums.UserRole;
-import vn.cineshow.model.*;
+import vn.cineshow.model.Account;
+import vn.cineshow.model.AccountProvider;
+import vn.cineshow.model.Role;
+import vn.cineshow.model.User;
 import vn.cineshow.repository.AccountProviderRepository;
 import vn.cineshow.repository.AccountRepository;
-import vn.cineshow.repository.RefreshTokenRepository;
 import vn.cineshow.repository.RoleRepository;
 import vn.cineshow.service.JWTService;
+import vn.cineshow.service.RefreshTokenService;
 
 import java.io.IOException;
-import java.time.Instant;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -35,7 +37,7 @@ public class CustomOAuth2SuccessHandler implements AuthenticationSuccessHandler 
     private final AccountRepository accountRepository;
     private final RoleRepository roleRepository;
     private final AccountProviderRepository accountProviderRepository;
-    private final RefreshTokenRepository refreshTokenRepository;
+    private final RefreshTokenService refreshTokenService;
 
     private static final String REDIRECT_URI = "http://localhost:3000/customer";
 
@@ -80,6 +82,7 @@ public class CustomOAuth2SuccessHandler implements AuthenticationSuccessHandler 
         String email = (String) attributes.get("email");
         String name = (String) attributes.get("name");
         String sub = (String) attributes.get("sub");
+
         String registrationId = authToken.getAuthorizedClientRegistrationId(); // "google-user" or "google-admin"
 
         // 1. Find account by email
@@ -89,7 +92,20 @@ public class CustomOAuth2SuccessHandler implements AuthenticationSuccessHandler 
         if (accountOptional.isPresent()) {
             account = accountOptional.get();
 
-            // Đảm bảo có provider GOOGLE
+            // 1. check account status
+            if (account.getStatus() == AccountStatus.DEACTIVATED || account.isDeleted()) {
+                response.sendError(HttpServletResponse.SC_FORBIDDEN,
+                        "Account inactive or deleted. Please contact support.");
+                return;
+            }
+
+            if (account.getStatus() == AccountStatus.PENDING) {
+                // if login with google -> active
+                account.setStatus(AccountStatus.ACTIVE);
+                accountRepository.save(account);
+            }
+
+            // 2. Đảm bảo account có provider GOOGLE
             accountProviderRepository.findByAccountAndProvider(account, AuthProvider.GOOGLE)
                     .orElseGet(() -> {
                         AccountProvider googleProvider = AccountProvider.builder()
@@ -101,14 +117,13 @@ public class CustomOAuth2SuccessHandler implements AuthenticationSuccessHandler 
                     });
 
         } else {
-            // if login with path admin-> block
+            //if not exist account -> new account
             if ("google-admin".equals(registrationId)) {
                 response.sendError(HttpServletResponse.SC_FORBIDDEN,
                         "Admin must exist before you can login");
                 return;
             }
 
-            // 2. have not an account -> create new
             Role role = roleRepository.findByRoleName(UserRole.CUSTOMER.name())
                     .orElseThrow(() -> new RuntimeException("Role not found"));
 
@@ -124,7 +139,6 @@ public class CustomOAuth2SuccessHandler implements AuthenticationSuccessHandler 
                     .status(AccountStatus.ACTIVE)
                     .build();
 
-            // 3. provider GOOGLE
             AccountProvider googleProvider = AccountProvider.builder()
                     .account(account)
                     .provider(AuthProvider.GOOGLE)
@@ -134,23 +148,20 @@ public class CustomOAuth2SuccessHandler implements AuthenticationSuccessHandler 
             accountRepository.save(account);
         }
 
-        // 4. Sinh JWT nội bộ
+
+        // 4. create refresh token
         String refreshToken = jwtService.generateRefreshToken(
                 email,
                 List.of(account.getRole().getRoleName())
         );
 
-        // Save refresh token to DB
-        RefreshToken entity = RefreshToken.builder()
-                .token(refreshToken)
-                .expiryDate(Instant.now().plusSeconds(jwtService.getRefreshTokenExpiryInSecond()))
-                .account(account).build();
-        refreshTokenRepository.save(entity);
+
+        refreshTokenService.replaceRefreshToken(account, refreshToken, jwtService.getRefreshTokenExpiryInSecond());
 
         // Set refresh token as HttpOnly cookie
         Cookie refreshCookie = new Cookie("refreshToken", refreshToken);
         refreshCookie.setHttpOnly(true);
-        refreshCookie.setSecure(true); // bật nếu dùng HTTPS
+        refreshCookie.setSecure(true);
         refreshCookie.setPath("/");
         refreshCookie.setMaxAge((int) jwtService.getRefreshTokenExpiryInSecond());
         response.addCookie(refreshCookie);

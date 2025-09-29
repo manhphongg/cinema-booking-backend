@@ -3,7 +3,7 @@ package vn.cineshow.model;
 import jakarta.persistence.*;
 import lombok.*;
 
-import java.time.Instant;
+import java.time.LocalDateTime;
 
 @Entity
 @Table(name = "refresh_tokens")
@@ -16,9 +16,9 @@ public class RefreshToken extends AbstractEntity {
 
     private String token;
 
-    private Instant expiryDate;
+    private LocalDateTime expiryDate;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "account_id", nullable = false)
+    @JoinColumn(name = "account_id", nullable = false, unique = true)
     private Account account;
 }
