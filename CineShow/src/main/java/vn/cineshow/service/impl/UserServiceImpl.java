@@ -2,6 +2,10 @@ package vn.cineshow.service.impl;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+import vn.cineshow.dto.request.UpdateUserRequest;
+import vn.cineshow.dto.response.UserResponse;
+import vn.cineshow.exception.ResourceNotFoundException;
 import vn.cineshow.model.User;
 import vn.cineshow.repository.UserRepository;
 import vn.cineshow.service.UserService;
@@ -25,8 +29,8 @@ public class UserServiceImpl implements UserService {
         return mapToResponse(user);
     }
 
-    @Override
     @Transactional
+    @Override
     public UserResponse updateProfile(String email, UpdateUserRequest request) {
         User user = getUserByEmail(email);
         user.setName(request.getName());
@@ -49,4 +53,5 @@ public class UserServiceImpl implements UserService {
                 .loyalPoint(user.getLoyalPoint())
                 .build();
     }
+}
 
