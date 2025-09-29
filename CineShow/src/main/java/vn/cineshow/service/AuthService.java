@@ -43,6 +43,13 @@ public class AuthService {
             if (userDetails instanceof Account account) {
                 // Sinh OTP
                 String otp = String.format("%06d", new Random().nextInt(999999));
+                
+                // Log OTP ra console để test
+                System.out.println("=== OTP FOR PASSWORD RESET ===");
+                System.out.println("Email: " + account.getEmail());
+                System.out.println("OTP: " + otp);
+                System.out.println("Expiry: " + LocalDateTime.now().plusMinutes(5));
+                System.out.println("==============================");
 
                 // Lưu token
                 PasswordResetToken token = PasswordResetToken.builder()
