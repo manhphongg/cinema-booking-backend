@@ -144,13 +144,12 @@ public class CustomOAuth2SuccessHandler implements AuthenticationSuccessHandler 
         );
 
 
-        // ✅ Ghi refresh token bằng service có @Transactional
         refreshTokenService.replaceRefreshToken(account, refreshToken, jwtService.getRefreshTokenExpiryInSecond());
 
         // Set refresh token as HttpOnly cookie
         Cookie refreshCookie = new Cookie("refreshToken", refreshToken);
         refreshCookie.setHttpOnly(true);
-        refreshCookie.setSecure(true); // bật nếu dùng HTTPS
+        refreshCookie.setSecure(true);
         refreshCookie.setPath("/");
         refreshCookie.setMaxAge((int) jwtService.getRefreshTokenExpiryInSecond());
         response.addCookie(refreshCookie);
