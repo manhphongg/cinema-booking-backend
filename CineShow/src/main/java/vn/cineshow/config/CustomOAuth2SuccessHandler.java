@@ -92,7 +92,20 @@ public class CustomOAuth2SuccessHandler implements AuthenticationSuccessHandler 
         if (accountOptional.isPresent()) {
             account = accountOptional.get();
 
-            // Đảm bảo có provider GOOGLE
+            // 1. check account status
+            if (account.getStatus() == AccountStatus.DEACTIVATED || account.isDeleted()) {
+                response.sendError(HttpServletResponse.SC_FORBIDDEN,
+                        "Account inactive or deleted. Please contact support.");
+                return;
+            }
+
+            if (account.getStatus() == AccountStatus.PENDING) {
+                // if login with google -> active
+                account.setStatus(AccountStatus.ACTIVE);
+                accountRepository.save(account);
+            }
+
+            // 2. Đảm bảo account có provider GOOGLE
             accountProviderRepository.findByAccountAndProvider(account, AuthProvider.GOOGLE)
                     .orElseGet(() -> {
                         AccountProvider googleProvider = AccountProvider.builder()
@@ -104,14 +117,13 @@ public class CustomOAuth2SuccessHandler implements AuthenticationSuccessHandler 
                     });
 
         } else {
-            // if login with path admin-> block
+            //if not exist account -> new account
             if ("google-admin".equals(registrationId)) {
                 response.sendError(HttpServletResponse.SC_FORBIDDEN,
                         "Admin must exist before you can login");
                 return;
             }
 
-            // 2. have not an account -> create new
             Role role = roleRepository.findByRoleName(UserRole.CUSTOMER.name())
                     .orElseThrow(() -> new RuntimeException("Role not found"));
 
@@ -127,7 +139,6 @@ public class CustomOAuth2SuccessHandler implements AuthenticationSuccessHandler 
                     .status(AccountStatus.ACTIVE)
                     .build();
 
-            // 3. provider GOOGLE
             AccountProvider googleProvider = AccountProvider.builder()
                     .account(account)
                     .provider(AuthProvider.GOOGLE)
@@ -137,7 +148,8 @@ public class CustomOAuth2SuccessHandler implements AuthenticationSuccessHandler 
             accountRepository.save(account);
         }
 
-        // 4. Sinh JWT nội bộ
+
+        // 4. create refresh token
         String refreshToken = jwtService.generateRefreshToken(
                 email,
                 List.of(account.getRole().getRoleName())
