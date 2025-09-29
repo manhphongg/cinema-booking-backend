@@ -14,15 +14,17 @@ import org.springframework.stereotype.Component;
 import vn.cineshow.enums.AccountStatus;
 import vn.cineshow.enums.AuthProvider;
 import vn.cineshow.enums.UserRole;
-import vn.cineshow.model.*;
+import vn.cineshow.model.Account;
+import vn.cineshow.model.AccountProvider;
+import vn.cineshow.model.Role;
+import vn.cineshow.model.User;
 import vn.cineshow.repository.AccountProviderRepository;
 import vn.cineshow.repository.AccountRepository;
-import vn.cineshow.repository.RefreshTokenRepository;
 import vn.cineshow.repository.RoleRepository;
 import vn.cineshow.service.JWTService;
+import vn.cineshow.service.RefreshTokenService;
 
 import java.io.IOException;
-import java.time.Instant;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -35,7 +37,7 @@ public class CustomOAuth2SuccessHandler implements AuthenticationSuccessHandler 
     private final AccountRepository accountRepository;
     private final RoleRepository roleRepository;
     private final AccountProviderRepository accountProviderRepository;
-    private final RefreshTokenRepository refreshTokenRepository;
+    private final RefreshTokenService refreshTokenService;
 
     private static final String REDIRECT_URI = "http://localhost:3000/customer";
 
@@ -141,12 +143,9 @@ public class CustomOAuth2SuccessHandler implements AuthenticationSuccessHandler 
                 List.of(account.getRole().getRoleName())
         );
 
-        // Save refresh token to DB
-        RefreshToken entity = RefreshToken.builder()
-                .token(refreshToken)
-                .expiryDate(Instant.now().plusSeconds(jwtService.getRefreshTokenExpiryInSecond()))
-                .account(account).build();
-        refreshTokenRepository.save(entity);
+
+        // ✅ Ghi refresh token bằng service có @Transactional
+        refreshTokenService.replaceRefreshToken(account, refreshToken, jwtService.getRefreshTokenExpiryInSecond());
 
         // Set refresh token as HttpOnly cookie
         Cookie refreshCookie = new Cookie("refreshToken", refreshToken);

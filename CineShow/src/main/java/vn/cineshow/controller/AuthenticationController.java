@@ -4,6 +4,7 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
+import jakarta.validation.constraints.Email;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpHeaders;
@@ -15,6 +16,8 @@ import vn.cineshow.dto.response.ResponseData;
 import vn.cineshow.dto.response.SignInResponse;
 import vn.cineshow.dto.response.TokenResponse;
 import vn.cineshow.service.AuthenticationService;
+import vn.cineshow.service.OtpService;
+import vn.cineshow.service.UserService;
 
 import java.time.Duration;
 
@@ -26,6 +29,10 @@ import java.time.Duration;
 public class AuthenticationController {
 
     private final AuthenticationService authenticationService;
+
+    private final UserService userService;
+
+    private final OtpService otpService;
 
     @Operation(summary = "Access token", description = "Get access token  email and password")
     @PostMapping("/log-in")
@@ -69,4 +76,26 @@ public class AuthenticationController {
         );
     }
 
+    @Operation(summary = "Resend verification email", description = "Resend account verification email")
+    @PostMapping("/resend-verification")
+    public ResponseData<String> resendVerification(@RequestParam @Email String email) {
+        log.info("Resend verification email request: {}", email);
+        String name = userService.getNameByAccountEmail(email);
+        otpService.sendOtp(email, name);
+        return new ResponseData<>(HttpStatus.OK.value(),
+                "Verification email has been resent",
+                email
+        );
+    }
+
+    @Operation(summary = "Verify account", description = "Verify account with token from email")
+    @PostMapping("/verify")
+    public ResponseData<String> verifyAccount(@RequestParam String code, @RequestParam String email) {
+        log.info("Verify account request with token: {}", code);
+
+        otpService.verifyOtp(code, email);
+        return new ResponseData<>(HttpStatus.OK.value(),
+                "Account verified successfully"
+        );
+    }
 }

@@ -29,6 +29,9 @@ public class Account extends AbstractEntity implements Serializable, UserDetails
     @Enumerated(EnumType.STRING)
     AccountStatus status;
 
+    @Column(name = "is_deleted", nullable = false)
+    private boolean isDeleted = false;
+
     @ManyToOne()
     @JoinColumn(name = "role_id")
     Role role;
@@ -54,8 +57,6 @@ public class Account extends AbstractEntity implements Serializable, UserDetails
         return Collections.singleton(new SimpleGrantedAuthority(roleName));
     }
 
-
-
     @Override
     public String getUsername() {
         return email;
@@ -68,8 +69,9 @@ public class Account extends AbstractEntity implements Serializable, UserDetails
 
     @Override
     public boolean isAccountNonLocked() {
-        return UserDetails.super.isAccountNonLocked();
+        return status != AccountStatus.DEACTIVATED && !isDeleted;
     }
+
 
     @Override
     public boolean isCredentialsNonExpired() {
@@ -78,6 +80,6 @@ public class Account extends AbstractEntity implements Serializable, UserDetails
 
     @Override
     public boolean isEnabled() {
-        return AccountStatus.ACTIVE.equals(status);
+        return AccountStatus.ACTIVE.equals(status) && !isDeleted;
     }
 }

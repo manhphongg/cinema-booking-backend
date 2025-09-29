@@ -6,12 +6,13 @@ import lombok.experimental.FieldDefaults;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.AuthenticationServiceException;
+import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import vn.cineshow.dto.request.SignInRequest;
 import vn.cineshow.dto.response.SignInResponse;
 import vn.cineshow.dto.response.TokenResponse;
@@ -19,11 +20,10 @@ import vn.cineshow.model.Account;
 import vn.cineshow.model.RefreshToken;
 import vn.cineshow.repository.AccountRepository;
 import vn.cineshow.repository.RefreshTokenRepository;
-import vn.cineshow.repository.RoleRepository;
 import vn.cineshow.service.AuthenticationService;
 import vn.cineshow.service.JWTService;
 
-import java.time.Instant;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -36,11 +36,9 @@ public class AuthenticationServiceImpl implements AuthenticationService {
     AccountRepository accountRepository;
     JWTService jwtService;
     AuthenticationManager authenticationManager;
-    RoleRepository roleRepository;
-    PasswordEncoder passwordEncoder;
-    EmailService emailService;
     RefreshTokenRepository refreshTokenRepository;
 
+    @Transactional
     @Override
     public TokenResponse signIn(SignInRequest req) {
         log.debug("getAccessToken");
@@ -55,13 +53,15 @@ public class AuthenticationServiceImpl implements AuthenticationService {
             log.info("isAuthenticated={}", authenticate.isAuthenticated());
             log.info("authorities={}", authenticate.getAuthorities());
 
-            authorities.add(authenticate.getAuthorities().toString());
-
+            authenticate.getAuthorities()
+                    .forEach(a -> authorities.add(a.getAuthority()));
             SecurityContextHolder.getContext().setAuthentication(authenticate);
 
+        } catch (BadCredentialsException e) {
+            throw new BadCredentialsException("Invalid email or password");
         } catch (AuthenticationException e) {
-            log.error("login failed: {}", e.getMessage());
-            throw new AuthenticationServiceException(e.getMessage());
+            log.info("Login failed");
+            throw new AuthenticationServiceException("Authentication failed");
         }
 
         Account account = accountRepository.getAccountByEmail(req.getEmail());
@@ -72,8 +72,9 @@ public class AuthenticationServiceImpl implements AuthenticationService {
         //save refreshToken to db
         RefreshToken entity = RefreshToken.builder()
                 .token(refreshToken)
-                .expiryDate(Instant.now().plusSeconds(jwtService.getRefreshTokenExpiryInSecond()))
+                .expiryDate(LocalDateTime.now().plusSeconds(jwtService.getRefreshTokenExpiryInSecond()))
                 .account(account).build();
+        refreshTokenRepository.deleteByAccount(account);
         refreshTokenRepository.save(entity);
 
         log.info("accessToken={}", accessToken);
@@ -88,13 +89,14 @@ public class AuthenticationServiceImpl implements AuthenticationService {
                 .build();
     }
 
+    @Transactional
     @Override
     public SignInResponse refresh(String refreshToken) {
         RefreshToken entity = refreshTokenRepository.findByToken(refreshToken)
                 .orElseThrow(() -> new AuthenticationServiceException("Invalid refresh token"));
 
         //check token out of Expiry date
-        if (entity.getExpiryDate().isBefore(Instant.now())) {
+        if (entity.getExpiryDate().isBefore(LocalDateTime.now())) {
             refreshTokenRepository.delete(entity);
             throw new AuthenticationServiceException("Refresh token expired");
         }
@@ -112,10 +114,4 @@ public class AuthenticationServiceImpl implements AuthenticationService {
                 .email(account.getEmail())
                 .build();
     }
-
-    private boolean isAccountExists(String email) {
-        return accountRepository.findByEmail(email).isPresent();
-    }
-
-
 }
