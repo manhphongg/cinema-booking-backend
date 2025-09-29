@@ -51,7 +51,7 @@ spring:
     add-properties: true
 
   datasource:
-    url: jdbc:mysql://${DB_HOST:localhost}:${DB_PORT:3306}/${DB_NAME:CineShow}?useUnicode=true&characterEncoding=UTF-8&createDatabaseIfNotExist=true&useSSL=false&allowPublicKeyRetrieval=true&serverTimezone=UTC
+    url: jdbc:mysql://${DB_HOST:localhost}:${DB_PORT:3306}/${DB_NAME:CineShow}?useUnicode=true&characterEncoding=UTF-8&createDatabaseIfNotExist=true&useSSL=false&allowPublicKeyRetrieval=true&serverTimezone=Asia/Ho_Chi_Minh
     username: ${DB_USER:root}
     password: ${DB_PASS:}
     driver-class-name: com.mysql.cj.jdbc.Driver
@@ -99,7 +99,7 @@ manager-account-test: { email: "manager@test.com", password: "12345678" }
 jwt:
   secret-key-access-token: "8mhZcWZVPhDeucdGaUQhUQoSkda34jAtkBPJNP54dvQ"
   secret-key-refresh-token: "Gu4jjMNk9oBnertRHqfRZJdHnz5jihbbnjAHeWNQbpg"
-  expiration-access-token: 15000 #3600000  #1000 * 60 * 60 time exist
+  expiration-access-token: 900000 # 15 phút (15 * 60 * 1000)
   expiration-refresh-token: 2592000000     #1000 * 60 * 60 * 24 *30
 
 
