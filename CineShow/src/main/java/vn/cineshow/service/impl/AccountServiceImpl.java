@@ -6,7 +6,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
-import vn.cineshow.dto.request.ChangePasswordRequest;
 import vn.cineshow.dto.request.EmailRegisterRequest;
 import vn.cineshow.dto.request.ForgotPasswordRequest;
 import vn.cineshow.dto.request.ResetPasswordRequest;
@@ -19,13 +18,10 @@ import vn.cineshow.model.User;
 import vn.cineshow.repository.AccountRepository;
 import vn.cineshow.repository.OtpCodeRepository;
 import vn.cineshow.service.AccountService;
-import vn.cineshow.service.OtpService;
 
 import java.time.Instant;
-import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
-import java.util.Random;
 
 @Service
 @RequiredArgsConstructor
@@ -36,7 +32,7 @@ class AccountServiceImpl implements AccountService {
     private final OtpCodeRepository otpCodeRepository;
     private final EmailService mailSender;
     private final PasswordEncoder passwordEncoder;
-    private final OtpService otpService;
+    private final OtpServiceImpl otpService;
 
     @Override
     public long createCustomerAccount(EmailRegisterRequest req) {
@@ -107,19 +103,4 @@ class AccountServiceImpl implements AccountService {
         otpCodeRepository.delete(token);
         return true;
     }
-
-    @Override
-    public boolean changePassword(ChangePasswordRequest request) {
-        Optional<UserDetails> optionalUserDetails = accountRepository.findByEmail(request.getEmail());
-
-        if (optionalUserDetails.isPresent() && optionalUserDetails.get() instanceof Account account) {
-            if (passwordEncoder.matches(request.getOldPassword(), account.getPassword())) {
-                account.setPassword(passwordEncoder.encode(request.getNewPassword()));
-                accountRepository.save(account);
-                return true;
-            }
-        }
-        return false;
-    }
-
 }
