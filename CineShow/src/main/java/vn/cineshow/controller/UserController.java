@@ -1,7 +1,7 @@
 package vn.cineshow.controller;
 
-import lombok.RequiredArgsConstructor;
 import jakarta.validation.Valid;
+import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -26,11 +26,12 @@ public class UserController {
         System.out.println("Principal class: " + (principal != null ? principal.getClass().getSimpleName() : "null"));
         System.out.println("Principal username: " + (principal != null ? principal.getUsername() : "null"));
         System.out.println("Principal authorities: " + (principal != null ? principal.getAuthorities() : "null"));
-        
+
         String email = resolveEmail(principal);
+
         System.out.println("Resolved email: " + email);
         System.out.println("=== END USER CONTROLLER DEBUG ===");
-        
+
         UserResponse response = userService.getProfile(email);
         return new ResponseData<>(HttpStatus.OK.value(), "Fetched user profile successfully", response);
     }

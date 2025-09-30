@@ -43,7 +43,6 @@ public class JWTServiceImpl implements JWTService {
     @Value("${jwt.expiration-refresh-token}")
     long expiration_refresh_token;
 
-
     @Override
     public String generateAccessToken(String email, List<String> authorities) {
         log.info("Generate access token for  and email {}", email);
@@ -64,7 +63,7 @@ public class JWTServiceImpl implements JWTService {
     @Override
     public String extractUsername(String token, TokenType tokenType) {
         log.info("Extract username from access token: {}", token);
-        return extractClaims(tokenType, token, claims -> claims.getSubject());
+        return extractClaims(tokenType, token, Claims::getSubject);
     }
 
     @Override
@@ -84,34 +83,12 @@ public class JWTServiceImpl implements JWTService {
 
     private Claims extractAllClaims(TokenType type, String token) {
         try {
-            log.info("🔍 Extracting claims from token type: {}", type);
-            log.info("🔍 Token: {}...", token.substring(0, Math.min(50, token.length())));
-            log.info("🔍 Secret key length: {}", getKey(type).getEncoded().length);
-            
-            Claims claims = Jwts.parserBuilder()
+            return Jwts.parserBuilder()
                     .setSigningKey(getKey(type))
                     .build()
                     .parseClaimsJws(token).getBody();
-            
-            log.info("✅ Claims extracted successfully");
-            log.info("✅ Subject: {}", claims.getSubject());
-            log.info("✅ Expiration: {}", claims.getExpiration());
-            log.info("✅ Issued at: {}", claims.getIssuedAt());
-            
-            return claims;
-        } catch (SignatureException e) {
-            log.error("❌ JWT Signature Exception: {}", e.getMessage());
-            throw new AccessDeniedException("JWT signature does not match! Token may be tampered with.");
-        } catch (ExpiredJwtException e) {
-            log.error("❌ JWT Expired Exception: {}", e.getMessage());
-            log.error("❌ Token expired at: {}", e.getClaims().getExpiration());
-            log.error("❌ Current time: {}", new Date());
-            throw new AccessDeniedException("JWT token has expired! Please login again.");
-        } catch (Exception e) {
-            log.error("❌ JWT Processing Exception: {}", e.getMessage());
-            log.error("❌ Exception type: {}", e.getClass().getSimpleName());
-            e.printStackTrace();
-            throw new AccessDeniedException("Invalid JWT token! Error: " + e.getMessage());
+        } catch (SignatureException | ExpiredJwtException e) {
+            throw new AccessDeniedException("Access denied!, error: " + e.getMessage());
         }
     }
 
