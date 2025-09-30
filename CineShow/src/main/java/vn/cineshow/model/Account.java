@@ -55,7 +55,6 @@ public class Account extends AbstractEntity implements Serializable, UserDetails
     }
 
 
-
     @Override
     public String getUsername() {
         return email;
