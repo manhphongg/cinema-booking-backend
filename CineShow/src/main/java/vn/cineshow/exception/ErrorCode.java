@@ -13,7 +13,6 @@ public enum ErrorCode {
     OTP_INVALID(1007, "Invalid OTP"),
     OTP_EXPIRED(1008, "OTP expired");
 
-
     private final int code;
     private final String message;
 

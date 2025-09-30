@@ -65,7 +65,6 @@ public class AccountController {
                 "OTP verified. You can now reset your password.", null);
     }
 
-
     // B4: Đặt lại mật khẩu bằng OTP
     @PostMapping("/reset-password")
     public ResponseData<?> resetPassword(@RequestBody @Valid ResetPasswordRequest request) {

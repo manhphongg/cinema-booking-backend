@@ -50,7 +50,7 @@ public class AuthenticationServiceImpl implements AuthenticationService {
                     new UsernamePasswordAuthenticationToken(req.getEmail(), req.getPassword())
             );
         } catch (AuthenticationException e) {
-            throw new BadCredentialsException("Email hoặc mật khẩu không đúng");
+            throw new BadCredentialsException("Email or Password invalid");
         }
 
         SecurityContextHolder.getContext().setAuthentication(authentication);
@@ -60,7 +60,7 @@ public class AuthenticationServiceImpl implements AuthenticationService {
                 .toList();
 
         Account account = accountRepository.findAccountByEmail(req.getEmail())
-                .orElseThrow(() -> new UsernameNotFoundException("Không tìm thấy tài khoản"));
+                .orElseThrow(() -> new UsernameNotFoundException("Account not found"));
 
         String accessToken = jwtService.generateAccessToken(req.getEmail(), authorities);
         String refreshToken = jwtService.generateRefreshToken(req.getEmail(), authorities);
