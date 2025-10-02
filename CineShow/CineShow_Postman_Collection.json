@@ -12,6 +12,7 @@
 				{
 					"name": "Login",
 					"request": {
+						"auth": null,
 						"method": "POST",
 						"header": [
 							{
@@ -21,7 +22,12 @@
 						],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n    \"email\": \"user@test.com\",\n    \"password\": \"12345678\"\n}"
+							"raw": "{\n    \"email\": \"user@test.com\",\n    \"password\": \"12345678\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
 						},
 						"url": {
 							"raw": "{{base_url}}/auth/log-in",
@@ -33,7 +39,7 @@
 								"log-in"
 							]
 						},
-						"description": "Đăng nhập với email và password"
+						"description": "Đăng nhập với email và password. Lưu ý lưu lại access token từ response để sử dụng cho các request khác."
 					},
 					"response": []
 				},
@@ -41,7 +47,12 @@
 					"name": "Refresh Token",
 					"request": {
 						"method": "POST",
-						"header": [],
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
 						"url": {
 							"raw": "{{base_url}}/auth/refresh-token",
 							"host": [
@@ -52,7 +63,55 @@
 								"refresh-token"
 							]
 						},
-						"description": "Lấy access token mới bằng refresh token"
+						"description": "Lấy access token mới bằng refresh token từ cookie"
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Password Management",
+			"item": [
+				{
+					"name": "Change Password (Requires Auth)",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{access_token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"oldPassword\": \"currentPassword123\",\n    \"newPassword\": \"newSecurePassword456\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{base_url}}/accounts/change-password",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"accounts",
+								"change-password"
+							]
+						},
+						"description": "Đổi mật khẩu khi đã biết mật khẩu cũ. Yêu cầu đã đăng nhập và có token hợp lệ."
 					},
 					"response": []
 				},
@@ -68,15 +127,20 @@
 						],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n    \"email\": \"user@test.com\"\n}"
+							"raw": "{\n    \"email\": \"user@test.com\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
 						},
 						"url": {
-							"raw": "{{base_url}}/auth/forgot-password",
+							"raw": "{{base_url}}/accounts/forgot-password",
 							"host": [
 								"{{base_url}}"
 							],
 							"path": [
-								"auth",
+								"accounts",
 								"forgot-password"
 							]
 						},
@@ -85,7 +149,7 @@
 					"response": []
 				},
 				{
-					"name": "Reset Password",
+					"name": "Reset Password with OTP",
 					"request": {
 						"method": "POST",
 						"header": [
@@ -94,10 +158,31 @@
 								"value": "application/json"
 							}
 						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"email\": \"user@test.com\",\n    \"otpCode\": \"123456\",\n    \"newPassword\": \"newSecurePassword123\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
 						"url": {
-							"raw": "{{base_url}}/auth/reset-password?email=user@test.com&otp=123456&newPassword=newpassword123",
+							"raw": "{{base_url}}/accounts/reset-password",
 							"host": [
 								"{{base_url}}"
+							],
+							"path": [
+								"accounts",
+								"reset-password"
+							]
+						},
+						"description": "Đặt lại mật khẩu mới bằng OTP đã gửi qua email"
+					},
+					"response": []
+				}
+			]
+		}
 							],
 							"path": [
 								"auth",

@@ -1,19 +1,15 @@
 package vn.cineshow.dto.request;
 
-import lombok.*;
-import vn.cineshow.utils.validator.Password;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.Size;
+import lombok.Data;
 
-@Getter
-@Setter
-@NoArgsConstructor
-@AllArgsConstructor
-@Builder
+@Data
 public class ChangePasswordRequest {
-    private String email;
-    @Password
+    @NotBlank(message = "Old password is required")
     private String oldPassword;
-    @Password
+    
+    @NotBlank(message = "New password is required")
+    @Size(min = 6, message = "Password must be at least 6 characters long")
     private String newPassword;
-
 }
-
