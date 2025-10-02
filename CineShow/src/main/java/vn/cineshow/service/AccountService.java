@@ -2,9 +2,18 @@ package vn.cineshow.service;
 
 
 import vn.cineshow.dto.request.EmailRegisterRequest;
-import vn.cineshow.model.Account;
+import vn.cineshow.dto.request.ForgotPasswordRequest;
+import vn.cineshow.dto.request.ResetPasswordRequest;
 
 public interface AccountService {
-    public long createCustomerAccount(EmailRegisterRequest req);
+    long createCustomerAccount(EmailRegisterRequest req);
+
+    boolean forgotPassword(ForgotPasswordRequest request);
+
+    boolean verifyOtpForReset(String email, String otp);
+
+    boolean resetPassword(ResetPasswordRequest request);
+    
+    boolean changePassword(String email, String oldPassword, String newPassword);
 
 }
