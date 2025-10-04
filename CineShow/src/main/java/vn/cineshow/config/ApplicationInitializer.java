@@ -20,7 +20,10 @@ import vn.cineshow.model.User;
 import vn.cineshow.repository.AccountRepository;
 import vn.cineshow.repository.RoleRepository;
 
+import java.util.Arrays;
 import java.util.List;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 @Configuration
 @RequiredArgsConstructor
@@ -56,13 +59,13 @@ public class ApplicationInitializer {
     @NonFinal
     String PASSWORD_STAFF;
 
-    @Value("${manager-account-test.email}")
+    @Value("${operation-account-test.email}")
     @NonFinal
-    String EMAIL_MANAGER;
+    String EMAIL_OPERATION;
 
-    @Value("${manager-account-test.password}")
+    @Value("${operation-account-test.password}")
     @NonFinal
-    String PASSWORD_MANAGER;
+    String PASSWORD_OPERATION;
 
     @Bean
     public ApplicationRunner initData() {
@@ -76,17 +79,15 @@ public class ApplicationInitializer {
         List<Role> roles = List.of(
                 new Role("ADMIN", "The administrator"),
                 new Role("CUSTOMER", "The customer using system"),
-                new Role("MANAGER", "The manager using system"),
+                new Role("OPERATION", "The operation manager using system"),
                 new Role("STAFF", "The staff using system")
         );
 
-        roles.forEach(role -> {
-            roleRepository.findByRoleName(role.getRoleName())
-                    .orElseGet(() -> {
-                        log.info("Initialized role: {}", role.getRoleName());
-                        return roleRepository.save(role);
-                    });
-        });
+        roles.forEach(role -> roleRepository.findByRoleName(role.getRoleName())
+                .orElseGet(() -> {
+                    log.info("Initialized role: {}", role.getRoleName());
+                    return roleRepository.save(role);
+                }));
     }
 
     void initAccounts() {
@@ -94,22 +95,24 @@ public class ApplicationInitializer {
         AccountCreationRequest admin = new AccountCreationRequest(EMAIL_ADMIN, PASSWORD_ADMIN, "System Admin", "Ha Noi");
         AccountCreationRequest customer = new AccountCreationRequest(EMAIL_USER, PASSWORD_USER, "System Customer", "Da Nang");
         AccountCreationRequest staff = new AccountCreationRequest(EMAIL_STAFF, PASSWORD_STAFF, "System Staff", "Ho Chi Minh");
-        AccountCreationRequest manager = new AccountCreationRequest(EMAIL_MANAGER, PASSWORD_MANAGER, "System Manager", "Hai Phong");
+        AccountCreationRequest manager = new AccountCreationRequest(EMAIL_OPERATION, PASSWORD_OPERATION, "Operations Manager", "Hai Phong");
 
-        createAccountIfNotExists(admin, UserRole.ADMIN.name());
+        createAccountIfNotExists(admin, UserRole.ADMIN.name(), UserRole.CUSTOMER.name());
         createAccountIfNotExists(customer, UserRole.CUSTOMER.name());
-        createAccountIfNotExists(staff, UserRole.STAFF.name());
-        createAccountIfNotExists(manager, UserRole.MANAGER.name());
+        createAccountIfNotExists(staff, UserRole.STAFF.name(), UserRole.CUSTOMER.name());
+        createAccountIfNotExists(manager, UserRole.OPERATION.name(), UserRole.CUSTOMER.name());
     }
 
-    void createAccountIfNotExists(AccountCreationRequest request, String roleName) {
+    void createAccountIfNotExists(AccountCreationRequest request, String... roleNames) {
         if (accountRepository.findByEmail(request.getEmail()).isPresent()) {
             log.warn("Account already exists: {}", request.getEmail());
             return;
         }
 
-        Role role = roleRepository.findByRoleName(roleName)
-                .orElseThrow(() -> new ResourceNotFoundException("Role not found"));
+        Set<Role> roles = Arrays.stream(roleNames)
+                .map(name -> roleRepository.findByRoleName(name)
+                        .orElseThrow(() -> new ResourceNotFoundException("Role not found: " + name)))
+                .collect(Collectors.toSet());
 
         User user = User.builder()
                 .name(request.getName())
@@ -120,13 +123,12 @@ public class ApplicationInitializer {
         Account account = Account.builder()
                 .email(request.getEmail())
                 .password(passwordEncoder.encode(request.getPassword()))
-                .role(role)
+                .roles(roles)
                 .user(user)
                 .status(AccountStatus.ACTIVE)
                 .build();
 
         user.setAccount(account);
-
         accountRepository.save(account);
         log.info("Created account: {}", request.getEmail());
     }

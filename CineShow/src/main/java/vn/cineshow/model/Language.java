@@ -17,8 +17,6 @@ import java.io.Serializable;
 @Builder
 @FieldDefaults(level = AccessLevel.PRIVATE)
 public class Language extends AbstractEntity implements Serializable {
-
     String code;
-
     String name;
 }

@@ -20,6 +20,7 @@ import vn.cineshow.service.RegisterService;
 
 import java.time.Instant;
 import java.util.Optional;
+import java.util.Set;
 
 @Service
 @RequiredArgsConstructor
@@ -81,7 +82,7 @@ public class RegisterServiceImpl implements RegisterService {
                 .email(req.email())
                 .password(encoder.encode(req.password()))
                 .status(AccountStatus.PENDING)
-                .role(customer)
+                .roles(Set.of(customer))
                 .user(user)
                 .build();
 

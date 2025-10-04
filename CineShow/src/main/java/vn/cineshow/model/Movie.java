@@ -1,5 +1,6 @@
 package vn.cineshow.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
@@ -27,6 +28,7 @@ public class Movie extends AbstractEntity implements Serializable {
 
     @Column(nullable = false)
     int duration;
+
     @Column(nullable = false)
     LocalDate releaseDate;
 
@@ -35,12 +37,24 @@ public class Movie extends AbstractEntity implements Serializable {
     private Language language;
 
     private String posterUrl;
-    private String bannerUrl;
+
     private String trailerUrl;
+
+    private int ageRating = 0;
+
+    private String director;
+
+    private String actor;
 
     @ManyToMany()
     private Set<MovieGenre> movieGenres;
 
     @OneToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL, mappedBy = "movie")
     private List<ShowTime> showTimes;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "country_id", nullable = false)
+    @JsonIgnore
+    private Country country;
+
 }
