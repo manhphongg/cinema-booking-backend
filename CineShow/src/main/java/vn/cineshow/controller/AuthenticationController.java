@@ -57,7 +57,7 @@ public class AuthenticationController {
                 "Login successful",
                 SignInResponse.builder()
                         .accessToken(tokenResponse.getAccessToken())
-                        .roleName(tokenResponse.getRoleName())
+                        .roleName(tokenResponse.getRoleNames())
                         .email(tokenResponse.getEmail())
                         .userId(tokenResponse.getUserId())
                         .build()

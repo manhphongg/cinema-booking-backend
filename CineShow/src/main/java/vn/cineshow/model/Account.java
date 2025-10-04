@@ -12,6 +12,7 @@ import java.io.Serializable;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
+import java.util.Set;
 
 @Entity
 @Table(name = "accounts")
@@ -32,9 +33,13 @@ public class Account extends AbstractEntity implements Serializable, UserDetails
     @Column(name = "is_deleted", nullable = false)
     private boolean isDeleted = false;
 
-    @ManyToOne()
-    @JoinColumn(name = "role_id")
-    Role role;
+    @ManyToMany(fetch = FetchType.EAGER)
+    @JoinTable(
+            name = "account_roles",
+            joinColumns = @JoinColumn(name = "account_id"),
+            inverseJoinColumns = @JoinColumn(name = "role_id")
+    )
+    Set<Role> roles;
 
     @OneToOne(mappedBy = "account", cascade = CascadeType.ALL)
     User user;
@@ -47,13 +52,13 @@ public class Account extends AbstractEntity implements Serializable, UserDetails
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
-        if (role == null) {
+        if (roles == null) {
             return Collections.emptyList();
         }
-        String roleName = role.getRoleName();
-        return Collections.singleton(new SimpleGrantedAuthority(roleName));
+        return roles.stream()
+                .map(role -> new SimpleGrantedAuthority(role.getRoleName()))
+                .toList();
     }
-
 
     @Override
     public String getUsername() {

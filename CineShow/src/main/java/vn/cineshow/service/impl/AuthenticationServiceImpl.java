@@ -20,6 +20,7 @@ import vn.cineshow.dto.response.SignInResponse;
 import vn.cineshow.dto.response.TokenResponse;
 import vn.cineshow.model.Account;
 import vn.cineshow.model.RefreshToken;
+import vn.cineshow.model.Role;
 import vn.cineshow.repository.AccountRepository;
 import vn.cineshow.repository.RefreshTokenRepository;
 import vn.cineshow.service.AuthenticationService;
@@ -67,11 +68,15 @@ public class AuthenticationServiceImpl implements AuthenticationService {
 
         refreshTokenService.replaceRefreshToken(account, refreshToken, jwtService.getRefreshTokenExpiryInSecond());
 
+        List<String> roleNames = account.getRoles().stream()
+                .map(Role::getRoleName)
+                .toList();
+
         return TokenResponse.builder()
                 .accessToken(accessToken)
                 .refreshToken(refreshToken)
                 .userId(account.getId())
-                .roleName(account.getRole().getRoleName())
+                .roleNames(roleNames)
                 .email(account.getEmail())
                 .build();
     }
@@ -88,15 +93,19 @@ public class AuthenticationServiceImpl implements AuthenticationService {
         }
 
         Account account = entity.getAccount();
+
+        List<String> roleNames = account.getRoles().stream()
+                .map(Role::getRoleName)
+                .toList();
+
         String newAccessToken = jwtService.generateAccessToken(
                 account.getEmail(),
-                List.of(account.getRole().getRoleName())
-        );
+                roleNames);
 
         return SignInResponse.builder()
                 .accessToken(newAccessToken)
                 .userId(account.getId())
-                .roleName(account.getRole().getRoleName())
+                .roleName(roleNames)
                 .email(account.getEmail())
                 .build();
     }

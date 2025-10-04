@@ -3,7 +3,6 @@ package vn.cineshow.service.impl;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -54,7 +53,6 @@ class AccountServiceImpl implements AccountService {
                 .gender(req.gender())
                 .dateOfBirth(req.dateOfBirth()).build();
 
-
         Account account = new Account();
         Account.builder()
                 .email(req.email())
@@ -67,12 +65,8 @@ class AccountServiceImpl implements AccountService {
                 .account(account)
                 .provider(AuthProvider.LOCAL)
                 .build();
-
         account.setProviders(List.of(provider));
-
         accountRepository.save(account);
-
-
         return account.getId();
     }
 
